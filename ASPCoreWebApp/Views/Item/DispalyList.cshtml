@@ -1,0 +1,74 @@
+﻿@model ASPCoreWebApp.Models.ItemViewModel
+
+@{
+    ViewData["Title"] = "DispalyList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+<p>
+    <a asp-action="Index">Create New</a>
+</p>
+<table class="table table-responsive-sm">
+    <thead>
+        <tr>
+            <th>
+                Item Code
+            </th>
+            <th>
+                Item Name
+            </th>
+            <th>
+                Description
+            </th>
+            <th>
+                UOM
+            </th>
+            <th>
+                UnitCost
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if( Model.Items != null)
+        {
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ItemCode)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ItemName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ItemDescription)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ItemUOM)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ItemUnitCost)
+                    </td>
+                    <td>
+                        @{
+                            string encodedId = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(item.ItemCode));
+                        }
+                        @Html.ActionLink("Edit", "Edit", new { id = encodedId }) |
+                        @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                        @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="5" class="text-danger">No Data Found</td>
+            </tr>
+        }
+    </tbody>
+</table>
