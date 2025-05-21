@@ -53,10 +53,65 @@
                     <button type="submit" class="btn btn-primary btn-sm">Submit</button>
                     <a asp-action="DispalyList" class="btn btn-primary btn-sm">Back</a>
                 </div>
-               
+
             </div>
         </div>
     </div>
-    
-   
+
+
 </form>
+<button type="button" onclick="addFileRow()" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle"></i>Add</button>
+<table id="fileTable" class="table" style="font-size: 12px;">
+    <thead>
+        <tr>
+            <th>File</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Remove</th>
+        </tr>
+    </thead>
+    <tbody id="fileRows">
+       
+    </tbody>
+</table>
+
+<button type="button" class="btn btn-primary btn-sm"> Save</button>
+@section Scripts {
+    <script>
+         let fileRowIndex = 0;
+        $(document).ready(function () {
+             addFileRow();
+        })
+
+
+        function addFileRow() {
+            var index = fileRowIndex++;
+
+            var row ='<tr>';
+               row+='<td><input type="file" class="form-control form-control-sm"  name="Files[' + index + '].File" /></td>';
+               row+='<td><input type="text" class="form-control form-control-sm"  name="Files[' + index + '].Name" /></td>';
+               row+='<td><input type="text" class="form-control form-control-sm"  name="Files[' + index + '].Description" /></td>';
+               row+='<td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)"><i class="bi bi-trash"></i></button></td>';
+                 row+='</tr>';
+
+           $("#fileRows").append(row);
+        }
+              function removeRow(btn) {
+                btn.closest("tr").remove();
+                 updateRowIndices();
+
+            }
+                 function updateRowIndices() {
+                $("#fileRows tr").each(function (i, row) {
+                    $(row).find("input").each(function () {
+                        let nameAttr = $(this).attr("name");
+                        if (nameAttr) {
+                            let newName = nameAttr.replace(/Files\[\d+\]/, `Files[${i}]`);
+                            $(this).attr("name", newName);
+                        }
+                    });
+                });
+                fileRowIndex = $("#fileRows tr").length; 
+            }
+    </script>
+}

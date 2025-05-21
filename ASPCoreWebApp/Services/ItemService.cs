@@ -42,12 +42,12 @@ namespace ASPCoreWebApp.Services
             using var transation = _context.Database.BeginTransaction();
             try
             {
-                TblItemMaster tblItem=await _context.TblItemMasters.FirstOrDefaultAsync(x=>x.ItemCode==itemViewModel.ItemCode);
-                if (tblItem==null)
+                TblItemMaster tblItem = await _context.TblItemMasters.FirstOrDefaultAsync(x => x.ItemCode == itemViewModel.ItemCode);
+                if (tblItem == null)
                     throw new Exception("Item not found");
                 tblItem.ItemName = itemViewModel.ItemName;
                 tblItem.ItemDescription = itemViewModel.ItemDescription;
-                tblItem.ItemUnitPrice= itemViewModel.ItemUnitCost;
+                tblItem.ItemUnitPrice = itemViewModel.ItemUnitCost;
                 tblItem.ItemUmo = itemViewModel.ItemUOM;
                 _context.Update(tblItem);
                 await _context.SaveChangesAsync();
@@ -64,8 +64,7 @@ namespace ASPCoreWebApp.Services
         {
             try
             {
-                var itemCodeParam = new SqlParameter("@ItemCode", code);
-                var qry = _context.Database.ExecuteSqlRaw("EXEC GetItemByCode @ItemCode", code);
+
                 TblItemMaster tblItem = _context.TblItemMasters.FirstOrDefault(x => x.ItemCode == code);
 
                 if (tblItem != null)

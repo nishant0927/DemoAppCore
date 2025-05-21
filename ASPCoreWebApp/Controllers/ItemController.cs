@@ -10,10 +10,12 @@ namespace ASPCoreWebApp.Controllers
     public class ItemController : Controller
     {
         private readonly IItemService _itemService;
+        private readonly IWebHostEnvironment _envernoment;
         //private readonly DBContex _context;
-        public ItemController(IItemService itemService)
+        public ItemController(IItemService itemService, IWebHostEnvironment envernoment)
         {
             _itemService = itemService;
+            _envernoment = envernoment;
         }
         public IActionResult Index()
         {
@@ -25,6 +27,7 @@ namespace ASPCoreWebApp.Controllers
         {
             try
             {
+                string uploadPath = Path.Combine(_envernoment.ContentRootPath, "uploads");
                 if (ModelState.IsValid)
                 {
                    await _itemService.AddItem(item);                    
@@ -61,8 +64,7 @@ namespace ASPCoreWebApp.Controllers
             try
             {
                 byte[] data = Convert.FromBase64String(id);
-                string decodedId = System.Text.Encoding.UTF8.GetString(data);
-                //string decodedId = Uri.UnescapeDataString(id);
+                string decodedId = System.Text.Encoding.UTF8.GetString(data);               
                 ItemViewModel tblItem = await _itemService.GetItemByCode(decodedId);
                 return View(tblItem);
             }
