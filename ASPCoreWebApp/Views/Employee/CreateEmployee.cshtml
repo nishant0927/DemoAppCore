@@ -1,0 +1,139 @@
+﻿@model ASPCoreWebApp.Models.EmployeeViewModel
+@{
+    ViewBag.Title = "Add Customer";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <i class="card-title">Add Customer</i>
+        </div>
+        <form enctype="multipart/form-data" id="employeeForm">
+            <div class="card-body">
+
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Employee Name <span class="text-danger">(*)</span></label>
+                            <input type="text" asp-for="EmpName" class="form-control form-control-sm" id="txtEmpName" />
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Department <span class="text-danger">(*)</span></label>
+                            <select asp-for="EmpDepartment" class="form-control form-control-sm" asp-items="@(new SelectList(@ViewBag.Department,"DepartmentId","DepartmentName"))"></select>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Designation <span class="text-danger">(*)</span></label>
+                            <select asp-for="EmpDesignation" class="form-control form-control-sm" asp-items="@(new SelectList(@ViewBag.Designation,"DesignationId","DesignationName"))"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table" style="font-size: 12px;" id="tblFiles">
+                            <thead>
+                                <tr>
+                                    <td colspan="3" class="">
+                                        <button type="button" onclick="addFileRow()" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle"></i>Add</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>File Name</th>
+                                    <th>Description</th>
+                                    <th>File</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyFile"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="card-footer">
+            <input type="button" value="Save" class="btn btn-primary btn-sm" id="btnSave" />
+        </div>
+    </div>
+</div>
+@section scripts {
+    <script>
+        let fileRowIndex = 0;
+        $(document).ready(function () {
+             addFileRow();
+        })
+        function addFileRow() {
+            var index = fileRowIndex++;
+
+            var row ='<tr>';
+               row+='<td><input type="text" class="form-control form-control-sm"  name="lstFiles[' + index + '].FileName" /></td>';
+               row+='<td><input type="text" class="form-control form-control-sm"  name="lstFiles[' + index + '].Description" /></td>';
+                row+='<td><input type="file" class="form-control form-control-sm"  name="lstFiles[' + index + '].File" /></td>';
+                row += '<td class="delete-cell"></td>';
+        //         if (index > 0) {
+        //     row += '<td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)"><i class="bi bi-trash"></i></button></td>';
+        // } else {
+        //     row += '<td></td>'; // Empty cell to align layout
+        // }
+               //row+='<td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)"><i class="bi bi-trash"></i></button></td>';
+                 row+='</tr>';
+
+           $("#tbodyFile").append(row);
+           updateRowIndices();
+        }
+        function removeRow(btn) {
+                btn.closest("tr").remove();
+                 updateRowIndices();
+
+            }
+            function updateRowIndices() {
+
+                const rows = $("#tbodyFile tr");
+                fileRowIndex = 0;
+                rows.each(function (i, row) {
+                    $(row).find("input").each(function () {
+                        let nameAttr = $(this).attr("name");
+                        if (nameAttr) {
+                        let newName = nameAttr.replace(/lstFiles\[\d+\]/, `lstFiles[${i}]`);
+                        $(this).attr("name", newName);
+                        }
+                    });
+                    const deleteCell = $(row).find(".delete-cell");
+                    if (rows.length > 1) {
+                // Show delete button on all rows
+                        if (!deleteCell.find("button").length) {
+                            deleteCell.html('<button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)"><i class="bi bi-trash"></i></button>');
+                        }
+                   } 
+                   else 
+                  {
+                // Hide delete button if only one row
+                    deleteCell.html('');
+                  }
+                  fileRowIndex++;
+              });
+            }
+
+
+            $("#btnSave").on('click',function(){
+                     var form = $('#employeeForm')[0];
+                     var formData = new FormData(form);
+                 $.ajax({
+                     url:'/Employee/CreateEmployee',
+                     type:'POST',
+                     data:formData,
+                      processData: false,
+                      contentType: false,
+                     success:function(response){
+                         alert("Data Saved");
+                     },
+                     error:function(errorMessage){
+                         alert("Error");
+                     }
+                 })
+            })
+    </script>
+}
