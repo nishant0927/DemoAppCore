@@ -9,6 +9,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<DBContex>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("connection")));
 builder.Services.AddScoped(typeof(ICommonService<>), typeof(CommonService<>));
 builder.Services.AddScoped<IItemService, ItemService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeServices>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -10,10 +10,12 @@ namespace ASPCoreWebApp.Controllers
     {
         private readonly ICommonService<TblDepartment> _departmentService;
         private readonly ICommonService<TblDesignationMaster> _designation;
-        public EmployeeController(ICommonService<TblDepartment> department, ICommonService<TblDesignationMaster> designation)
+        private readonly IEmployeeService _iEmployee;
+        public EmployeeController(ICommonService<TblDepartment> department, ICommonService<TblDesignationMaster> designation, IEmployeeService employeeService)
         {
             _departmentService = department;
             _designation = designation;
+            _iEmployee = employeeService;
         }
         public IActionResult Index()
         {
@@ -32,6 +34,10 @@ namespace ASPCoreWebApp.Controllers
         {
             try
             {
+                if (ModelState.IsValid)
+                {
+                    await _iEmployee.SaveEmployeeData(employee);
+                }
                 return View();
             }
             catch(Exception ex)
