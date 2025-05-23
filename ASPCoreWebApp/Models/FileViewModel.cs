@@ -10,7 +10,7 @@
 
         public string Description { get; set; } = null!;
 
-        //public string FilePath { get; set; } = null!;
+        public string? FilePath { get; set; }
         public IFormFile File { get; set; } = null!;
     }
 }

@@ -2,6 +2,7 @@
 using ASPCoreWebApp.DB;
 using ASPCoreWebApp.DB.Table;
 using ASPCoreWebApp.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting.Internal;
 
 namespace ASPCoreWebApp.Services
@@ -19,6 +20,56 @@ namespace ASPCoreWebApp.Services
             _TblFile = tblFile;
             _hostingEnvironment = hostingEnvironment;
         }
+
+        public async Task<List<EmployeeViewModel>> GetAllEmployeeData()
+        {
+            return await (from emp in _context.TableEmployees
+                          join dep in _context.TblDepartments on emp.EmpDepartment equals dep.DepartmentId into deptJoin
+                          from dep in deptJoin.DefaultIfEmpty()
+                          join des in _context.TblDesignationMasters on emp.EmpDesignation equals des.DesignationId into desJoin
+                          from des in desJoin.DefaultIfEmpty()
+                          select new EmployeeViewModel
+                          {
+                              EmpGuid = emp.EmpGuid,
+                              EmpName = emp.EmpName,
+                              EmpDepartmentName = dep != null ? dep.DepartmentName : "",
+                              EmpDesignationName =des !=null? des.DesignationName:""
+                          }).ToListAsync();
+        }
+
+        public async Task<EmployeeViewModel> GetEmployeeAsyc(Guid id)
+        {
+            try
+            {
+                var employeeDatat = await _TblEmployee.GetFilterDataAsync(x => x.EmpGuid.Equals(id));
+                var files = await _TblFile.GetAllFilterDataAsync(x => x.EmpGuid.Equals(id));
+                if (employeeDatat == null)
+                    return null;
+                EmployeeViewModel employeeViewModel = new EmployeeViewModel
+                {
+                    EmpGuid = employeeDatat.EmpGuid,
+                    EmpName = employeeDatat.EmpName,
+                    EmpDepartment = employeeDatat.EmpDepartment,
+                    EmpDesignation = employeeDatat.EmpDesignation,
+                    lstFiles = files.Select(f => new FileViewModel
+                    {
+                        EmpGuid = f.EmpGuid,
+                        FileGuid = f.FileGuid,
+                        FileName = f.FileName,
+                        Description = f.Description,
+                        FilePath = f.FilePath
+
+                    }).ToList()
+                };
+                return employeeViewModel;
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            
+        }
+
         public async Task<bool> SaveEmployeeData(EmployeeViewModel employee)
         {
             using var transation=_context.Database.BeginTransaction();
@@ -45,7 +96,7 @@ namespace ASPCoreWebApp.Services
             }
 
         }
-        public async Task<bool> SaveFileData(List<FileViewModel> lstFileViewModal,Guid EmpGuid)
+        private async Task<bool> SaveFileData(List<FileViewModel> lstFileViewModal,Guid EmpGuid)
         {
             try
             {

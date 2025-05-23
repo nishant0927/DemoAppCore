@@ -12,7 +12,13 @@ namespace ASPCoreWebApp.Models
         public int EmpDesignation { get; set; }
 
         public int EmpDepartment { get; set; }
+        public string? EmpDepartmentName {  get; set; }
+
+        public string? EmpDesignationName {  get; set; }
+
 
         public List<FileViewModel> lstFiles { get; set; } = new();
+
+       
     }
 }

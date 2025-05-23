@@ -94,30 +94,6 @@ namespace ASPCoreWebApp.Controllers
             }
         }
 
-        //public string GenerateItemCode(string itemName)
-        //{
-        //    int currentYear = DateTime.Now.Year;
-        //    int nextYear = currentYear + 1;
-        //    if (DateTime.Now.Month < 4)
-        //    {
-        //        currentYear -= 1;
-        //        nextYear -= 1;
-        //    }
-        //    string fyear = (currentYear % 100).ToString("D2") + "-" + (nextYear % 100).ToString("D2");
-        //    var lastIte = _context.TblItemMasters.OrderByDescending(i => i.Id).FirstOrDefault();
-        //    int newItemNumber = 1;
-        //    if (lastIte != null && lastIte.ItemCode.StartsWith("Item"))
-        //    {
-        //        string[] parts = lastIte.ItemCode.Split('/');
-        //        if (parts.Length > 0 && int.TryParse(parts[0].Substring(4), out int lastNumber))
-        //        {
-        //            newItemNumber = lastNumber + 1;
-        //        }
-        //    }
-        //    string formattedNumber = $"Item{newItemNumber:000}";
-
-        //    // Combine parts to generate the item code
-        //    return $"{formattedNumber}/{fyear}/{itemName}";
-        //}
+       
     }
 }

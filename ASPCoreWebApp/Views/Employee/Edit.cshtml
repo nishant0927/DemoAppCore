@@ -1,0 +1,69 @@
+﻿@model EmployeeViewModel
+
+@{
+    ViewBag.Title = "Edit Employee";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <header class="bg-primary text-center text-capitalize">
+                <small>Edit Employee</small>
+            </header>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label>Employee Name <span class="text-danger">(*)</span></label>
+                        <input type="text" asp-for="EmpName" class="form-control form-control-sm" id="txtEmpName" />
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label>Department <span class="text-danger">(*)</span></label>
+                        <select asp-for="EmpDepartment" class="form-control form-control-sm" asp-items="@(new SelectList(@ViewBag.Department,"DepartmentId","DepartmentName"))"></select>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label>Designation <span class="text-danger">(*)</span></label>
+                        <select asp-for="EmpDesignation" class="form-control form-control-sm" asp-items="@(new SelectList(@ViewBag.Designation,"DesignationId","DesignationName"))"></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <table class="table" style="font-size: 12px;" id="tblFiles">
+                        <thead>
+                            <tr>
+                                <td colspan="3" class="">
+                                    <button type="button" onclick="addFileRow()" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle"></i>Add</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>File Name</th>
+                                <th>Description</th>
+                                <th>File</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyFile">
+                            @if(Model.lstFiles!=null & Model.lstFiles.Count > 0)
+                            {
+                               for (int i = 0; i < Model.lstFiles.Count; i++)
+                                {
+                                    <tr>
+                                        <td><input type="text" class="form-control form-control-sm" name="lstFiles[@i].FileName" value="@Model.lstFiles[i].FileName" /></td>
+                                        <td><input type="text" class="form-control form-control-sm" name="lstFiles[@i].Description" value="@Model.lstFiles[i].Description" />
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

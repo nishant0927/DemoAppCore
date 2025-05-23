@@ -1,0 +1,63 @@
+﻿@model List< ASPCoreWebApp.Models.EmployeeViewModel>
+@{
+    ViewBag.Title = "View Employee";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="container-fluid">
+    <p>
+        <a asp-action="CreateEmployee">Create New</a>
+    </p>
+    <div class="card">
+        <div class="card-header bg-primary text-center text-capitalize">
+            <header>
+                <small>Employee</small>
+            </header>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped" style="font-size: 12px;">
+                <thead>
+                    <tr>
+                        <th>Sl No.</th>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Designation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if(Model!=null && Model.Count > 0)
+                    {
+                        int i = 1;
+                        foreach(var emp in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @i
+                                </td>
+                                <td>@emp.EmpName</td>
+                                <td>@emp.EmpDepartmentName</td>
+                                <td>@emp.EmpDesignationName</td>
+                                <td>
+                                    @Html.ActionLink("Edit","Edit",new{id=emp.EmpGuid})|
+                                    @Html.ActionLink("Detail","Detail",new{id=emp.EmpGuid})|
+                                    @Html.ActionLink("Delete","Delete",new{id=emp.EmpGuid})
+
+                                </td>
+                            </tr>
+                            i++;
+                        }
+
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="bg-danger text-center text-white"> No Data Found</td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

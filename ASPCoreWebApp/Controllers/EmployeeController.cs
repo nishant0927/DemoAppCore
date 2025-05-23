@@ -3,6 +3,7 @@ using ASPCoreWebApp.DB.Table;
 using ASPCoreWebApp.Models;
 using ASPCoreWebApp.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace ASPCoreWebApp.Controllers
 {
@@ -17,9 +18,10 @@ namespace ASPCoreWebApp.Controllers
             _designation = designation;
             _iEmployee = employeeService;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            List<EmployeeViewModel> lst=await _iEmployee.GetAllEmployeeData();
+            return View(lst);
         }
 
         public async Task< IActionResult> CreateEmployee()
@@ -43,6 +45,24 @@ namespace ASPCoreWebApp.Controllers
             catch(Exception ex)
             {
                 return Json(new { success = false, responseText = ex.Message });
+            }
+        }
+
+        public async Task<IActionResult> Edit(string id)
+        {
+            try
+            {
+                EmployeeViewModel emp =await _iEmployee.GetEmployeeAsyc(Guid.Parse( id));
+                if (emp == null)
+                    return NotFound();
+
+                ViewBag.Department = await CommonHelper.GetDepartment(_departmentService);
+                ViewBag.Designation = await CommonHelper.GetDesignation(_designation);
+                return View(emp);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.ToString());
             }
         }
     }
