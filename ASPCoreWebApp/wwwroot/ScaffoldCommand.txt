@@ -1,0 +1,1 @@
+﻿ dotnet ef dbcontext scaffold "Server=DESKTOP-T5RNCLV\SA;Database=DemoDB;Trusted_Connection=True;TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer -o DemoEntity --context-dir DemoContextEntity --context DemoDBContex --project D:\Project\ASPNETCoreSolution\DAL\DAL.csproj

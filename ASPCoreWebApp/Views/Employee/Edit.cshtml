@@ -55,7 +55,8 @@
                                 {
                                     <tr>
                                         <td><input type="text" class="form-control form-control-sm" name="lstFiles[@i].FileName" value="@Model.lstFiles[i].FileName" /></td>
-                                        <td><input type="text" class="form-control form-control-sm" name="lstFiles[@i].Description" value="@Model.lstFiles[i].Description" />
+                                        <td><input type="text" class="form-control form-control-sm" name="lstFiles[@i].Description" value="@Model.lstFiles[i].Description" /></td>
+                                        <td><a href="@Url.Content(Model.lstFiles[i].FilePath)" target="_blank">@Model.lstFiles[i].FileName</a></td>
                                     </tr>
                                 }
                             }

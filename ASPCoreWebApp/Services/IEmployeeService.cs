@@ -7,5 +7,6 @@ namespace ASPCoreWebApp.Services
         Task<bool> SaveEmployeeData(EmployeeViewModel employee);
         Task<List<EmployeeViewModel>> GetAllEmployeeData();
         Task<EmployeeViewModel> GetEmployeeAsyc(Guid id);
+        Task<EmployeeViewModel> GetEmployeeAdnFileFromDBAsyc(Guid id);
     }
 }

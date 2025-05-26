@@ -25,6 +25,7 @@ public partial class DBContex : DbContext
     public virtual DbSet<TblFile> TblFiles { get; set; }
 
     public virtual DbSet<TblItemMaster> TblItemMasters { get; set; }
+    public virtual DbSet<TblFileForDatatBase> TblFileForDatatBases { get; set; }
 
 //    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -114,6 +115,30 @@ public partial class DBContex : DbContext
                 .HasMaxLength(20)
                 .HasColumnName("ItemUMO");
             entity.Property(e => e.ItemUnitPrice).HasColumnType("decimal(18, 2)");
+        });
+
+        modelBuilder.Entity<TblFileForDatatBase>(entity =>
+        {
+            entity.ToTable("TblFileForDatatBase");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.EmpGUId).HasColumnName("EmpGUId");
+
+            entity.Property(e => e.FileGuid).HasColumnName("FileGuid");
+
+            entity.Property(e => e.Data)
+                .IsRequired(); 
+
+            entity.Property(e => e.Description)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            entity.HasOne(e => e.Emp)
+                .WithMany(e => e.TblFileForDatatBase)
+                .HasForeignKey(e => e.EmpGUId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TblFileForDatatBase_TableEmployee");
         });
 
         OnModelCreatingPartial(modelBuilder);

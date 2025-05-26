@@ -1,4 +1,5 @@
 using ASPCoreWebApp.DB;
+using ASPCoreWebApp.Models;
 using ASPCoreWebApp.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +11,7 @@ builder.Services.AddDbContext<DBContex>(options => options.UseSqlServer(builder.
 builder.Services.AddScoped(typeof(ICommonService<>), typeof(CommonService<>));
 builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeServices>();
+builder.Services.Configure<FileStorageOptions>(builder.Configuration.GetSection("FileStorage"));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

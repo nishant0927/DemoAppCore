@@ -2,8 +2,10 @@
 using ASPCoreWebApp.DB;
 using ASPCoreWebApp.DB.Table;
 using ASPCoreWebApp.Models;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting.Internal;
+using Microsoft.Extensions.Options;
 
 namespace ASPCoreWebApp.Services
 {
@@ -13,12 +15,16 @@ namespace ASPCoreWebApp.Services
         private readonly ICommonService<TableEmployee> _TblEmployee;
         private readonly ICommonService<TblFile> _TblFile;
         private readonly IWebHostEnvironment _hostingEnvironment;
-        public EmployeeServices(DBContex context, ICommonService<TableEmployee> tableEmployee, ICommonService<TblFile> tblFile, IWebHostEnvironment hostingEnvironment)
+        private readonly FileStorageOptions _storageOption;
+        private readonly ICommonService<TblFileForDatatBase> _TblFileForDatatBase;
+        public EmployeeServices(DBContex context, ICommonService<TableEmployee> tableEmployee, ICommonService<TblFile> tblFile, IWebHostEnvironment hostingEnvironment, IOptions<FileStorageOptions> options, ICommonService<TblFileForDatatBase> tblFileForDatatBase)
         {
             _context = context;
             _TblEmployee = tableEmployee;
             _TblFile = tblFile;
             _hostingEnvironment = hostingEnvironment;
+            _storageOption = options.Value;
+            _TblFileForDatatBase = tblFileForDatatBase;
         }
 
         public async Task<List<EmployeeViewModel>> GetAllEmployeeData()
@@ -35,6 +41,39 @@ namespace ASPCoreWebApp.Services
                               EmpDepartmentName = dep != null ? dep.DepartmentName : "",
                               EmpDesignationName =des !=null? des.DesignationName:""
                           }).ToListAsync();
+        }
+
+        public async Task<EmployeeViewModel> GetEmployeeAdnFileFromDBAsyc(Guid id)
+        {
+            try
+            {
+                var employeeDatat = await _TblEmployee.GetFilterDataAsync(x => x.EmpGuid.Equals(id));
+                var files = await _TblFileForDatatBase.GetAllFilterDataAsync(x => x.EmpGUId.Equals(id));
+                if (employeeDatat == null)
+                    return null;
+                EmployeeViewModel employeeViewModel = new EmployeeViewModel
+                {
+                    EmpGuid = employeeDatat.EmpGuid,
+                    EmpName = employeeDatat.EmpName,
+                    EmpDepartment = employeeDatat.EmpDepartment,
+                    EmpDesignation = employeeDatat.EmpDesignation,
+                    lstFiles = files.Select(f => new FileViewModel
+                    {
+                        
+                        EmpGuid = f.EmpGUId,
+                        FileGuid = f.FileGuid,
+                        //FileName = f.FileName,
+                        Description = f.Description,
+                        
+                    }).ToList()
+                };
+                return employeeViewModel;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
         }
 
         public async Task<EmployeeViewModel> GetEmployeeAsyc(Guid id)
@@ -57,7 +96,7 @@ namespace ASPCoreWebApp.Services
                         FileGuid = f.FileGuid,
                         FileName = f.FileName,
                         Description = f.Description,
-                        FilePath = f.FilePath
+                        FilePath = $"/{_storageOption.BaseUrlPath}/{f.EmpGuid}/{f.FileGuid}/{f.FileName}"
 
                     }).ToList()
                 };
@@ -96,6 +135,36 @@ namespace ASPCoreWebApp.Services
             }
 
         }
+
+        private async Task<bool> SaveFileInDatatBase(List<FileViewModel> lstFileViewModal, Guid EmpGuid)
+        {
+            try
+            {
+                List<TblFileForDatatBase> lst = new List<TblFileForDatatBase>();
+
+                foreach (var fileVm in lstFileViewModal)
+                {
+                    if (fileVm.File != null && fileVm.File.Length > 0)
+                    {
+                        using var memoryStream = new MemoryStream();
+                        await fileVm.File.CopyToAsync(memoryStream);
+                        TblFileForDatatBase tblFileForDatatBase = new TblFileForDatatBase();
+                        tblFileForDatatBase.FileGuid = fileVm.FileGuid;
+                        tblFileForDatatBase.EmpGUId = EmpGuid;
+                        tblFileForDatatBase.Description = fileVm.Description;
+                        tblFileForDatatBase.Data = memoryStream.ToArray();
+                        await _TblFileForDatatBase.Save(tblFileForDatatBase);
+
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         private async Task<bool> SaveFileData(List<FileViewModel> lstFileViewModal,Guid EmpGuid)
         {
             try
@@ -111,7 +180,7 @@ namespace ASPCoreWebApp.Services
                             {
                                 EmpGuid=EmpGuid,
                                 FileGuid=fileVm.FileGuid,
-                                FileName=fileVm.FileName,
+                                FileName=fileVm.File.FileName,
                                 FilePath=saveFile,
                                 Description=fileVm.Description,
                             };
@@ -126,5 +195,21 @@ namespace ASPCoreWebApp.Services
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<IFormFile?> GetFileAsIFormFileAsync(Guid fileGuid)
+        {
+            var fileData = await _TblFileForDatatBase.GetFilterDataAsync(f => f.FileGuid == fileGuid);
+            if (fileData == null || fileData.Data == null || fileData.Data.Length == 0)
+                return null;
+
+            var stream = new MemoryStream(fileData.Data);
+            stream.Position = 0;
+
+            // Description used as filename; change as needed
+            return new FormFile(stream, 0, stream.Length, "file", $"{fileData.Description ?? "uploaded-file.bin"}");
+        }
+
+
+
     }
 }

@@ -20,4 +20,5 @@ public partial class TableEmployee
     public virtual TblDesignationMaster EmpDesignationNavigation { get; set; } = null!;
 
     public virtual ICollection<TblFile> TblFiles { get; set; } = new List<TblFile>();
+    public virtual ICollection<TblFileForDatatBase> TblFileForDatatBase { get; set; } = new List<TblFileForDatatBase>();
 }
